@@ -67,7 +67,19 @@ void ShowMenu()
 }
 void ShowProcessList()
 {
-
+	
+	PROCESSENTRY32 pc;
+	pc.dwSize = sizeof(pc);
+	HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	BOOL bMore = Process32First(hProcessSnap, &pc);
+	while(bMore)
+	{
+		printf("\n----------------------------\n");
+		printf("id:%d\n", pc.th32ProcessID);
+		wprintf(L"name:%s\n", pc.szExeFile);
+		bMore = Process32Next(hProcessSnap, &pc);
+	}
+	CloseHandle(hProcessSnap);
 }
 void EditProcessData()
 {
