@@ -29,6 +29,7 @@ int main(void)
 		while (!scanf_s("%d", &select))
 		{
 			rewind(stdin);
+			printf("Please enter your choice.");
 		}
 
 		switch (select)
@@ -87,5 +88,30 @@ void EditProcessData()
 }
 void KillProcess()
 {
+	//input pid
+	BOOL bRet;
+	DWORD dwId = 0;
+	printf("Enter process id which you want to kill...\n");
+	while (!scanf_s("%u", &dwId))
+	{
+		rewind(stdin);
+		printf("Please enter process id which you want to kill...");
+	}	
+	//Open process
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwId);
+	if (hProcess != NULL)
+	{
+		bRet = TerminateProcess(hProcess, 0);
+	}
+	CloseHandle(hProcess);
 
+	if (bRet)
+	{
+		printf("Kill process success.\n");
+	}
+	else
+	{
+		printf("Kill process fail.\n");
+	}
+	
 }
