@@ -1,6 +1,6 @@
 /*
 Name: Game Modifier
-Description:
+Function:
 	1. List all process
 	2. Select spefic process and modify memory.
 	3. Kill the process
@@ -11,6 +11,11 @@ Build by: etandmouse@gmail.com
 #include <Windows.h>
 #include <stdlib.h>
 #include <TlHelp32.h>
+
+void ShowMenu();
+void ShowProcessList();
+void EditProcessData();
+void KillProcess();
 
 int main(void)
 {
@@ -38,14 +43,37 @@ int main(void)
 			KillProcess();
 			break;
 		case 4:
-			printf("Thank for your using....");
+			printf("Thank for your using....\n");
 			system("pause");
 			return 0;
 		default:
-			printf("Please select again 1~4");
+			printf("Please select again 1~4\n");
 			break;
 		}
 	}	
 
 	return 0;
+}
+
+void ShowMenu()
+{
+	printf("-----------------------------------------------\n");
+	printf("Menu:\n");
+	printf("\t1. Show system process list.\n");
+	printf("\t2. Input porcess id which you want to edit.\n");
+	printf("\t3. Input porcess id which you want to kill.\n");
+	printf("\t4. Exit.\n");
+	printf("------------------------------------------------\n");
+}
+void ShowProcessList()
+{
+
+}
+void EditProcessData()
+{
+
+}
+void KillProcess()
+{
+
 }
