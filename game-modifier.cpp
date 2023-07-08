@@ -141,6 +141,11 @@ void EditProcessData()
 				printf("Edit failed!!!\n");
 			}
 		}
+		else
+		{
+			//dwAddrCount is more than 1
+			SecondRound();
+		}
 	}
 }
 void KillProcess()
@@ -235,4 +240,9 @@ void ShowAddrList(DWORD *pDwAddrList, DWORD dwAddrCount)
 		
 	}
 	printf("\n--------------Address list end--------------------\n");
+}
+
+void SecondRound(HANDLE hProcess, DWORD dwValue, DWORD *pDwAddrList, DWORD dwAddrListCount,)
+{
+
 }
