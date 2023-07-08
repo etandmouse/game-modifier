@@ -38,7 +38,7 @@ int main(void)
 		while (!scanf_s("%d", &select))
 		{
 			rewind(stdin);
-			printf("Please enter your choice.");
+			printf("Please enter your choice.\n");
 		}
 
 		switch (select)
@@ -98,14 +98,14 @@ void EditProcessData()
 	DWORD dwAddrList[4 * KONEK] = { 0 };
 	DWORD dwAddrCount = 0;
 	BOOL bRet = FALSE;
-	printf("Please enter process id which you want to edit...");
+	printf("Please enter process id which you want to edit...\n");
 	while (!scanf_s("%u", &dwId))
 	{
 		rewind(stdin);
-		printf("Please enter process id which you want to edit...");
+		printf("Please enter process id which you want to edit...\n");
 	}
 	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwId);
-	if (NULL != hProcess)
+	if (NULL == hProcess)
 	{
 		printf("Open process fail\n");
 		return;
@@ -152,11 +152,14 @@ void EditProcessData()
 			printf("Enter the value that you need search second find...");
 			scanf_s("%u", &dwSecondRoundSearchValue);
 			
+			SecondRound(hProcess, dwSecondRoundSearchValue, dwAddrList, dwAddrCount, dwTargetList, &dwTargetCounter);
+			ShowAddrList(dwTargetList, dwTargetCounter);
+
 			DWORD value;
 			printf("Enter the value that you wnat to set...");
 			scanf_s("%u", &value);
 
-			SecondRound(hProcess, dwSecondRoundSearchValue, dwAddrList, dwAddrCount, dwTargetList, &dwTargetCounter);
+			
 			for (DWORD i = 0; i < dwTargetCounter; i++)
 			{
 				bRet = WriteProcessMemory(hProcess, (LPVOID)dwTargetList[i], (LPCVOID)&value, sizeof(DWORD), NULL);
@@ -175,14 +178,13 @@ void EditProcessData()
 }
 void KillProcess()
 {
-	//input pid
-	BOOL bRet;
+	BOOL bRet = FALSE;
 	DWORD dwId = 0;
 	printf("Enter process id which you want to kill...\n");
 	while (!scanf_s("%u", &dwId))
 	{
 		rewind(stdin);
-		printf("Please enter process id which you want to kill...");
+		printf("Please enter process id which you want to kill...\n");
 	}	
 	//Open process
 	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwId);
@@ -219,7 +221,7 @@ void FirstRound(HANDLE hProcess, DWORD dwValue, DWORD *pAddrList, DWORD *pAddrLi
 		DWORD page = (dwBaseAddr - dwBeginAddr) / KPAGE + 1;
 		printf("current is %u page\n", page);
 		double temp = ((double)page / dwPageCount) * 100;
-		printf("-------------%%%f--------------", temp);
+		printf("-------------%%%f--------------\n", temp);
 	}
 	printf("\nSearch finished...\n");
 	system("pause");
@@ -260,7 +262,7 @@ void ShowAddrList(DWORD *pDwAddrList, DWORD dwAddrCount)
 	{
 		if (pDwAddrList[i] != 0)
 		{
-			printf("dwAddrList[%u] = %X", dwAddrCount, pDwAddrList[i]);
+			printf("dwAddrList[%u] = %X\n", i, pDwAddrList[i]);
 		}
 		
 	}
