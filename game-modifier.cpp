@@ -23,6 +23,7 @@ void KillProcess();
 
 void FirstRound(HANDLE hProcess, DWORD dwValue, DWORD* pAddrList, DWORD* pAddrListCounter, const DWORD addrListMax);
 BOOL CompareOnePage(HANDLE hProcess, DWORD dwBaseAddr, DWORD dwValue, DWORD* pAddrList, DWORD* pAddrListCounter, const DWORD addrListMax);
+void ShowAddrList(DWORD* dwAddrList, DWORD dwAddrCount);
 
 int main(void)
 {
@@ -119,7 +120,7 @@ void EditProcessData()
 		}
 		
 		FirstRound (hProcess, dwSearchValue, dwAddrList, &dwAddrCount, 4 * KONEK);
-		//ShwoAddrList();
+		ShowAddrList(dwAddrList, dwAddrCount);
 	}
 }
 void KillProcess()
@@ -200,4 +201,18 @@ BOOL CompareOnePage(HANDLE hProcess, DWORD dwBaseAddr, DWORD dwValue, DWORD *pAd
 		}
 	}
 	return TRUE;
+}
+
+void ShowAddrList(DWORD *pDwAddrList, DWORD dwAddrCount)
+{
+	printf("\n--------------Address list brgin--------------------\n");
+	for (DWORD i = 0; i < dwAddrCount; i++)
+	{
+		if (pDwAddrList[i] != 0)
+		{
+			printf("dwAddrList[%u] = %X", dwAddrCount, pDwAddrList[i]);
+		}
+		
+	}
+	printf("\n--------------Address list end--------------------\n");
 }
