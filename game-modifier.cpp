@@ -96,6 +96,7 @@ void EditProcessData()
 	DWORD dwSearchValue = 0;
 	DWORD dwAddrList[4 * KONEK] = { 0 };
 	DWORD dwAddrCount = 0;
+	BOOL bRet = FALSE;
 	printf("Please enter process id which you want to edit...");
 	while (!scanf_s("%u", &dwId))
 	{
@@ -121,6 +122,25 @@ void EditProcessData()
 		
 		FirstRound (hProcess, dwSearchValue, dwAddrList, &dwAddrCount, 4 * KONEK);
 		ShowAddrList(dwAddrList, dwAddrCount);
+
+		if (dwAddrCount == 0)
+		{
+			return;
+		}
+		else if (dwAddrCount == 1)
+		{
+			DWORD value;
+			scanf_s("%u", &value);
+			bRet = WriteProcessMemory(hProcess, (LPVOID) dwAddrList[0], (LPCVOID)&value, sizeof(DWORD), NULL);
+			if (bRet)
+			{
+				printf("Edit success!!!\n");
+			}
+			else
+			{
+				printf("Edit failed!!!\n");
+			}
+		}
 	}
 }
 void KillProcess()
