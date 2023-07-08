@@ -24,6 +24,7 @@ void KillProcess();
 void FirstRound(HANDLE hProcess, DWORD dwValue, DWORD* pAddrList, DWORD* pAddrListCounter, const DWORD addrListMax);
 BOOL CompareOnePage(HANDLE hProcess, DWORD dwBaseAddr, DWORD dwValue, DWORD* pAddrList, DWORD* pAddrListCounter, const DWORD addrListMax);
 void ShowAddrList(DWORD* dwAddrList, DWORD dwAddrCount);
+void SecondRound(HANDLE hProcess, DWORD dwValue, DWORD* pAddrList, DWORD dwAddrListCount, DWORD* pTargetList, DWORD* pTargetCounter);
 
 int main(void)
 {
@@ -130,6 +131,7 @@ void EditProcessData()
 		else if (dwAddrCount == 1)
 		{
 			DWORD value;
+			printf("Enter the value that you wnat to set...");
 			scanf_s("%u", &value);
 			bRet = WriteProcessMemory(hProcess, (LPVOID) dwAddrList[0], (LPCVOID)&value, sizeof(DWORD), NULL);
 			if (bRet)
@@ -144,9 +146,32 @@ void EditProcessData()
 		else
 		{
 			//dwAddrCount is more than 1
-			SecondRound();
+			DWORD dwSecondRoundSearchValue;
+			DWORD dwTargetList[KONEK] = { 0 };
+			DWORD dwTargetCounter = 0;
+			printf("Enter the value that you need search second find...");
+			scanf_s("%u", &dwSecondRoundSearchValue);
+			
+			DWORD value;
+			printf("Enter the value that you wnat to set...");
+			scanf_s("%u", &value);
+
+			SecondRound(hProcess, dwSecondRoundSearchValue, dwAddrList, dwAddrCount, dwTargetList, &dwTargetCounter);
+			for (DWORD i = 0; i < dwTargetCounter; i++)
+			{
+				bRet = WriteProcessMemory(hProcess, (LPVOID)dwTargetList[i], (LPCVOID)&value, sizeof(DWORD), NULL);
+				if (bRet)
+				{
+					printf("Edit success!!!\n");
+				}
+				else
+				{
+					printf("Edit failed!!!\n");
+				}
+			}
 		}
 	}
+	CloseHandle(hProcess);
 }
 void KillProcess()
 {
@@ -242,7 +267,18 @@ void ShowAddrList(DWORD *pDwAddrList, DWORD dwAddrCount)
 	printf("\n--------------Address list end--------------------\n");
 }
 
-void SecondRound(HANDLE hProcess, DWORD dwValue, DWORD *pDwAddrList, DWORD dwAddrListCount,)
+void SecondRound(HANDLE hProcess, DWORD dwValue, DWORD *pAddrList, DWORD dwAddrListCount, DWORD *pTargetList, DWORD *pTargetCounter)
 {
-
+	DWORD dwTemp = 0;
+	for (DWORD i = 0; i < dwAddrListCount; i++)
+	{
+		if (ReadProcessMemory(hProcess, (LPCVOID)pAddrList[i], &dwTemp, sizeof(dwTemp), NULL))
+		{
+			if (dwTemp == dwValue)
+			{
+				pTargetList[*pTargetCounter] = pAddrList[i];
+				(*pTargetCounter)++;
+			}
+		}
+	}
 }
