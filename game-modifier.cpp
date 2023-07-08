@@ -84,7 +84,34 @@ void ShowProcessList()
 }
 void EditProcessData()
 {
-
+	DWORD dwId = 0;
+	DWORD dwSearchValue = 0;
+	printf("Please enter process id which you want to kill...");
+	while (!scanf_s("%u", &dwId))
+	{
+		rewind(stdin);
+		printf("Please enter process id which you want to kill...");
+	}
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwId);
+	if (NULL != hProcess)
+	{
+		printf("Open process fail\n");
+		return;
+	}
+	else
+	{
+		printf("Open process success\n");
+		system("pause");
+		printf("Please enter valuse which you want to search first round\n");
+		while (!scanf_s("%u", &dwSearchValue))
+		{
+			rewind(stdin);
+			printf("Please enter valuse which you want to search first round\n");
+		}
+		
+		FisrtRound();
+		ShwoAddrList();
+	}
 }
 void KillProcess()
 {
