@@ -12,10 +12,17 @@ Build by: etandmouse@gmail.com
 #include <stdlib.h>
 #include <TlHelp32.h>
 
+const DWORD KONEK = 1024;
+const DWORD KPAGE = 4 * KONEK;
+const DWORD KONEG = KONEK * KONEK * KONEK;
+
 void ShowMenu();
 void ShowProcessList();
 void EditProcessData();
 void KillProcess();
+
+void FirstRound(HANDLE hProcess, DWORD dwValue, DWORD* pAddrList, DWORD* pAddrListCounter, const DWORD addrListMax);
+BOOL CompareOnePage(HANDLE hProcess, DWORD dwBaseAddr, DWORD dwValue, DWORD* pAddrList, DWORD* pAddrListCounter, const DWORD addrListMax);
 
 int main(void)
 {
@@ -86,11 +93,13 @@ void EditProcessData()
 {
 	DWORD dwId = 0;
 	DWORD dwSearchValue = 0;
-	printf("Please enter process id which you want to kill...");
+	DWORD dwAddrList[4 * KONEK] = { 0 };
+	DWORD dwAddrCount = 0;
+	printf("Please enter process id which you want to edit...");
 	while (!scanf_s("%u", &dwId))
 	{
 		rewind(stdin);
-		printf("Please enter process id which you want to kill...");
+		printf("Please enter process id which you want to edit...");
 	}
 	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwId);
 	if (NULL != hProcess)
@@ -109,8 +118,8 @@ void EditProcessData()
 			printf("Please enter valuse which you want to search first round\n");
 		}
 		
-		FisrtRound();
-		ShwoAddrList();
+		FirstRound (hProcess, dwSearchValue, dwAddrList, &dwAddrCount, 4 * KONEK);
+		//ShwoAddrList();
 	}
 }
 void KillProcess()
@@ -141,4 +150,54 @@ void KillProcess()
 		printf("Kill process fail.\n");
 	}
 	
+}
+void FirstRound(HANDLE hProcess, DWORD dwValue, DWORD *pAddrList, DWORD *pAddrListCounter, const DWORD addrListMax)
+{
+	DWORD dwBaseAddr = 64 * KONEK;
+	DWORD dwPageCount = (2 * KONEG - 64 * KONEK * 2) / KPAGE;
+	printf("%u pages \n", dwPageCount);
+	printf("Start searching ...\n");
+	DWORD dwBeginAddr = dwBaseAddr;
+	for (; dwBaseAddr < 2 * KONEG - 64 * KONEK; dwBaseAddr += KPAGE)
+	{
+		if (!CompareOnePage(hProcess, dwBaseAddr, dwValue, pAddrList, pAddrListCounter, addrListMax))
+		{
+			return;
+		}
+
+		DWORD page = (dwBaseAddr - dwBeginAddr) / KPAGE + 1;
+		printf("current is %u page\n", page);
+		double temp = ((double)page / dwPageCount) * 100;
+		printf("-------------%%%f--------------", temp);
+	}
+	printf("\nSearch finished...\n");
+	system("pause");
+}
+
+BOOL CompareOnePage(HANDLE hProcess, DWORD dwBaseAddr, DWORD dwValue, DWORD *pAddrList, DWORD *pAddrListCounter, const DWORD addrListMax)
+{
+	BYTE byPage[KPAGE] = { 0 };
+	if (!ReadProcessMemory(hProcess, (LPCVOID)dwBaseAddr, (LPVOID)byPage, KPAGE, NULL))
+	{
+		printf("Read Memory error!!!\n");
+		return TRUE;
+	}
+
+	DWORD* pdwPointer = NULL;
+	pdwPointer = (DWORD *)byPage;
+
+	for (DWORD i = 0; i < KONEK; i++)
+	{
+		if (*pAddrListCounter >= addrListMax)
+		{
+			printf("Too many data, can not save...\n");
+			return FALSE;
+		}
+		if (pdwPointer[i] == dwValue)
+		{
+			pAddrList[*pAddrListCounter] = dwBaseAddr + i * sizeof(DWORD);
+			(*pAddrListCounter)++;
+		}
+	}
+	return TRUE;
 }
